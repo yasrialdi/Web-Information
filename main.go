@@ -175,6 +175,22 @@ func deleteCustomer(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Customer with ID = %s was deleted", params["id"])
 }
 
+func delCustomer(w http.ResponseWriter, r *http.Request) {
+
+	customerID := r.FormValue("CustomerID")
+	companyName := r.FormValue("CompanyName")
+
+	stmt, err := db.Prepare("DELETE FROM customers WHERE CustomerID = ? AND CompanyName = ?")
+
+	_, err = stmt.Exec(customerID, companyName)
+
+	if err != nil {
+		fmt.Fprintf(w, "delete failed")
+	}
+
+	fmt.Fprintf(w, "Customer with ID = %s was deleted", customerID)
+}
+
 func getPost(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -246,6 +262,10 @@ func main() {
 	//New
 	r.HandleFunc("/getcustomer", getPost).Methods("POST")
 
+	//DelCustomers
+	r.HandleFunc("/delcustomers", delCustomer).Methods("POST")
+
 	// Start server
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
+
